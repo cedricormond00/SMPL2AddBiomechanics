@@ -38,6 +38,7 @@ def load_smpl_seq(smpl_seq_path):
     out_dict['betas'] = data_dict['betas']
     out_dict['gender'] = data_dict['gender']
     
+    
     fps_key = [k for k in data_dict.keys() if k.endswith('rate')][0] # works if the key is 'mocap_rate' or 'mocap_framerate'
     out_dict.update({'fps':data_dict.get(fps_key)})
         

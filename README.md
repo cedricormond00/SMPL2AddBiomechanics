@@ -22,61 +22,139 @@ If you are loooking for the SKEL model code, please check the [SKEL repository](
 
 ## Table of Contents 
 
-- [Installation](#installation)
-  - [SMPL](#smpl)
-  - [BSM](#bsm)
-  - [OSSO (Optional)](#osso-optional)
-- [Usage](#usage)
-  - [Quick start](#quick-start)
-  - [Custom markers](#custom-markers)
-  - [Running AddBiomechanics locally](#running-addbiomechanics-locally)
-- [Running the code on your own data](#running-the-code-on-your-own-data)
-  - [SMPL sequences](#smpl-sequences)
-  - [Biomechanical model](#biomechanical-model)
-  - [Markers on SMPL](#markers-on-smpl)
-  - [Using SMPL X](#using-smpl-x)
-- [Citation](#citation)
-- [License](#license)
-- [Contact](#contact)
+- [SMPL to AddBiomechanics](#smpl-to-addbiomechanics)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+    - [**1. Create and activate the Conda environment**](#1-create-and-activate-the-conda-environment)
+    - [**2. Install this repository**](#2-install-this-repository)
+    - [**3. Install required runtime dependencies**](#3-install-required-runtime-dependencies)
+    - [**4. Install the SKEL fork of aitviewer (required)**](#4-install-the-skel-fork-of-aitviewer-required)
+    - [**5. Fix NumPy version for chumpy compatibility**](#5-fix-numpy-version-for-chumpy-compatibility)
+    - [**6. Install SMPL and BSM model assets**](#6-install-smpl-and-bsm-model-assets)
+    - [**7. Install OSSO** (optional)](#7-install-osso-optional)
+    - [**8. Test the installation**](#8-test-the-installation)
+    - [**9. AITViewer**](#9-aitviewer)
+  - [Usage](#usage)
+    - [Quick start](#quick-start)
+    - [Custom markers](#custom-markers)
+    - [Running AddBiomechanics locally](#running-addbiomechanics-locally)
+  - [Running the code on your own data](#running-the-code-on-your-own-data)
+    - [SMPL sequences](#smpl-sequences)
+    - [Biomechanical model](#biomechanical-model)
+    - [Markers on SMPL](#markers-on-smpl)
+    - [Using SMPL X](#using-smpl-x)
+  - [Citation](#citation)
+  - [License](#license)
+  - [Contact](#contact)
 
 ## Installation
 
 This repo was tested with python3.8
 
-First, install the dependencies and the package with the following line:
-```pip install -e .```
+I installed this repo through a dedicated Conda environment, allowing compatibility across packages. 
 
 
-### SMPL
+### **1. Create and activate the Conda environment**
 
-Download the file: SMPL_python_v.1.1.0.zip from the [SMPL download page](https://smpl.is.tue.mpg.de/). And run:
-
-```
-cd ../SMPL2AddBiomechanics
-python scripts/setup_smpl.py /path/to/SMPL_python_v.1.1.0.zip  
+```bash
+conda create -n smpl2ab python=3.8
+conda activate smpl2ab
 ```
 
-If you plan to use SMPL-X files rather than SMPL+H ones, also download the file: smplx_lockedhead_20230207.zip from the [SMPL-X download page](https://smpl-x.is.tue.mpg.de/). And run:
+### **2. Install this repository**
 
-```
-cd ../SMPL2AddBiomechanics
-python scripts/setup_smplx.py /path/to/smplx_lockedhead_20230207.zip  
-```
+From inside the repository:
 
-
-### BSM 
-
-Download the file: skel_models_v1.x.zip from the [SKEL download page](https://skel.is.tue.mpg.de/). And run:
-
-```
-cd ../SMPL2AddBiomechanics
-python scripts/setup_bsm.py /path/to/skel_models_v1.1.zip
+```bash
+pip install -e .
 ```
 
+### **3. Install required runtime dependencies**
 
-### OSSO (Optional)
+These must be installed manually:
+
+```bash
+conda install -c conda-forge trimesh
+pip install pyyaml
+pip install chumpy
+```
+
+### **4. Install the SKEL fork of aitviewer (required)**
+
+The standard PyPI version of `aitviewer` is **not** compatible with this project.
+Install the SKEL fork instead:
+
+```bash
+cd ~
+git clone https://github.com/MarilynKeller/aitviewer-skel.git
+cd aitviewer-skel
+pip install -e .
+```
+
+Then return to this repo:
+
+```bash
+cd ~/SMPL2AddBiomechanics
+```
+
+In this repo, make sure you update the aitvconfig.yaml file with your correct:
+```bash
+
+smplx_models: "/local/home/cormond/SMPL2AddBiomechanics/models/"
+# skel_models: "/local/home/cormond/SMPL2AddBiomechanics/models/bsm"
+skel_models : "/local/home/cormond/SMPL2AddBiomechanics/models/bsm/"
+```
+### **5. Fix NumPy version for chumpy compatibility**
+
+`chumpy` requires an older NumPy API:
+
+```bash
+conda install -c conda-forge "numpy<1.24"
+```
+
+### **6. Install SMPL and BSM model assets**
+
+Download:
+
+* **SMPL**: `SMPL_python_v.1.1.0.zip`
+* **BSM**: `skel_models_v1.1.zip`
+
+Then run the setup scripts:
+
+```bash
+python scripts/setup_smpl.py /path/to/SMPL_python_v.1.1.0.zip
+python scripts/setup_bsm.py  /path/to/skel_models_v1.1.zip
+```
+
+(Optional, if using SMPL-X):
+
+```bash
+python scripts/setup_smplx.py /path/to/smplx_lockedhead_20230207.zip
+```
+
+### **7. Install OSSO** (optional)
 To generate a personalized custom marker set on the BSM model, you will need [OSSO](https://github.com/MarilynKeller/OSSO/). Please check the [OSSO installation instructions](https://github.com/MarilynKeller/OSSO/blob/main/installation.md) to set it up.
 
+
+
+
+### **8. Test the installation**
+
+```bash
+python smpl2ab/smpl2addbio.py -i models/bsm/sample_motion/01
+```
+
+If installation was successful, the script will generate:
+
+```
+output/
+  └── 01/
+      ├── _subject.json
+      └── trials/
+          └── 01_01_poses.trc
+```
+### **9. AITViewer**
+Make sure you isntall the AITVIEWER from 
 
 ## Usage
 
@@ -101,6 +179,12 @@ The `_subject.json` file contains the estimated subject measurements :
 `{"sex": "male", "massKg": "68.94", "heightM": "1.80"}`
 , and the `trc` file contains the synthetic motion capture data for the input sequences.
 
+
+Alternatively, I ran this using my own dataset. Simply run:
+```bash
+scripts_shell/smpl2ab.sh TAKE_NAME #stored on /media/cormond/hdd/data/pilot_oct10/$take_name/smpl_fit
+```
+
 This information can be used as input for [AddBiomechanics](https://addbiomechanics.org/) to align the OpenSim model to the motion capture data.
 
 In the 'Upload Custom OpenSim Model' section, upload the BSM model `models/bsm/bsm.osim`.
@@ -120,6 +204,13 @@ Once the process done, you can download the results (in this case 01.zip), extra
 ```
 
 This script shows the superimposition of the input SMPL sequences, the markers that were created in green, and the OpenSim skeleton aligned by AddBiomechanics.
+
+Alternatively, just run this script, to get the superposition from your own data output from AddBiomechanics:
+```bash
+scripts_shell/show_ab_results.sh TAKE_NAME 
+
+# data from AddBiomechanics must be stored here: /local/home/cormond/SMPL2AddBiomechanics/addbiomechanics/$take_name/
+```
 
 https://github.com/MarilynKeller/SMPL2AddBiomechanics/assets/102662583/0995bd48-8ef7-4ed8-aaad-b92199f6ae3e
 

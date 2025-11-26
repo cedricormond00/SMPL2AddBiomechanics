@@ -1,5 +1,8 @@
 output/
 models/
+inputs/
+addbiomechanics/
+visuals/
 *__pycache__/
 imgui.ini
 *.egg-info/
