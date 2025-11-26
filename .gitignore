@@ -2,7 +2,7 @@ output/
 models/
 inputs/
 addbiomechanics/
-visuals/
+# visuals/
 *__pycache__/
 imgui.ini
 *.egg-info/
