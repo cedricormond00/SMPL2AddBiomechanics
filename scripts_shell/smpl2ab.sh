@@ -10,3 +10,5 @@ python ./scripts/build_smpl_for_smpl2ab.py \
   --gender male \
   --out inputs/smpl_seq/$take_name/$take_name \
   --fps 30
+
+python ./smpl2ab/smpl2addbio.py -i  inputs/smpl_seq/$take_name
